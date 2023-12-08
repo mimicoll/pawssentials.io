@@ -222,7 +222,7 @@ function assignRowFieldValues(row) {
     dateCreated.value = columns[3].textContent;
     targetDate.value  = columns[4].textContent;
     requestedBy.value = columns[1].textContent;
-    assignedTo.value  = columns[12].textContent;
+    assignedTo.value  = columns[2].textContent;
     department.value  = columns[2].textContent;
 }
 
@@ -571,11 +571,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     columns[5].textContent = ownername.value;
     columns[0].textContent = title.value       
-    columns[3].textContent = dateCreated.value 
-    columns[4].textContent = targetDate.value  
-    columns[1].textContent = requestedBy.value 
-    columns[2].textContent = department.value
-    columns[12].textContent = assignedTo.value  
+    columns[3].textContent = dateCreated.value; 
+    columns[4].textContent = targetDate.value;  
+    columns[1].textContent = requestedBy.value; 
+    columns[2].textContent = department.value;
+    columns[2].textContent = assignedTo.value;  
     
     generateToast("text-bg-success",`Ticket ${ticketNo[0].textContent} updated`); 
   });
