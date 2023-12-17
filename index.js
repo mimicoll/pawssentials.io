@@ -199,11 +199,9 @@ function assignRowFieldValues(row) {
     let ownername    = document.getElementById('ownername');
     let status      = document.getElementById('field-status');
     let title       = document.getElementById('request-title');
-    let description = document.getElementById('ticket-description');
     let dateCreated = document.getElementById('date-created');
     let targetDate  = document.getElementById('target-date');
     let requestedBy = document.getElementById('petname');
-    let assignedTo  = document.getElementById('assigned-to');
     let department  = document.getElementById('department');
     let completed   = document.getElementById('date-completed');
     const statusArray = ['ongoing','on queue','completed','overdue'];
@@ -218,11 +216,9 @@ function assignRowFieldValues(row) {
     ownername.value    = columns[5].textContent;
     status.value      = textContentArray.join("/");
     title.value       = columns[0].textContent;
-    description.value = 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Animi esse provident mollitia aut illum perspiciatis hic sint similique consequuntur, odio aspernatur impedit excepturi praesentium architecto, voluptates dolore voluptas dolores dicta!';
     dateCreated.value = columns[3].textContent;
     targetDate.value  = columns[4].textContent;
     requestedBy.value = columns[1].textContent;
-    assignedTo.value  = columns[2].textContent;
     department.value  = columns[2].textContent;
 }
 
@@ -238,7 +234,7 @@ function clearFieldValues() {
   let ownername    = document.getElementById('ownername');
   let status      = document.getElementById('field-status');
   let title       = document.getElementById('request-title');
-  let description = document.getElementById('ticket-description');
+  let description = document.getElementById('description');
   let dateCreated = document.getElementById('date-created');
   let targetDate  = document.getElementById('target-date');
   let requestedBy = document.getElementById('petname');
@@ -280,11 +276,11 @@ function clearFieldValues() {
 
 
 function addTicketRecord() {
-  let newTicketNo = `TIX-${new Date().getFullYear()}${new Date().getMonth()+1}${new Date().getDate()}`
+  let newTicketNo = `APPT.NO-${new Date().getFullYear()}${new Date().getMonth()+1}${new Date().getDate()}`
   let ownername    = document.getElementById('ownername');
   let status      = document.getElementById('field-status');
   let title       = document.getElementById('request-title');
-  let description = document.getElementById('ticket-description');
+  let description = document.getElementById('description');
   let dateCreated = document.getElementById('date-created');
   let targetDate  = document.getElementById('target-date');
   let requestedBy = document.getElementById('petname');
@@ -401,39 +397,46 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
 
-  // ADD BUTTON
-  addButton.addEventListener('click', function(){
-    let modalView = document.querySelector("#viewTicketModal");
-    const createButton = modalView.querySelector("#modal-btn-create");
-    let myModal = new bootstrap.Modal(modalView);
-    myModal.show();
+ // ADD BUTTON
+addButton.addEventListener('click', function(){
+  let modalView = document.querySelector("#viewTicketModal");
+  const createButton = modalView.querySelector("#modal-btn-create");
+  let myModal = new bootstrap.Modal(modalView);
+  myModal.show();
 
-    const inputFields = document.querySelectorAll(".form-control");
-    inputFields.forEach(input => {
-      if(input.id != "date-completed") input.removeAttribute("disabled");
-    });
-
-    // make text field empty
-    clearFieldValues();
-
-    // CREATE TICKET BUTTON
-    createButton.addEventListener('click', function(event){
-      const forms = document.querySelectorAll('.requires-validation');
-      Array.from(forms).forEach(function (form) {
-        if (!form.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
-            
-        } else {
-          addTicketRecord();
-          myModal.hide();
-        }
-        form.classList.add('was-validated');
-      })
-    });
-
-
+  const inputFields = document.querySelectorAll(".form-control");
+  inputFields.forEach(input => {
+    if(input.id != "date-completed") input.removeAttribute("disabled");
   });
+
+  // make text field empty
+  clearFieldValues();
+
+  // Remove any existing event listener before adding a new one
+  createButton.removeEventListener('click', createTicketClickHandler);
+
+  // CREATE TICKET BUTTON
+  function createTicketClickHandler(event) {
+    const forms = document.querySelectorAll('.requires-validation');
+    Array.from(forms).forEach(function (form) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      } else {
+        addTicketRecord();
+        myModal.hide();
+      }
+      form.classList.add('was-validated');
+    });
+  }
+
+  createButton.addEventListener('click', createTicketClickHandler);
+
+  // Close the modal and clean up event listener on modal hide
+  modalMain.addEventListener("hidden.bs.modal", function(){
+    createButton.removeEventListener('click', createTicketClickHandler);
+  });
+});
 
 
   // ALL DELETE BUTTONS
@@ -457,6 +460,16 @@ document.addEventListener('DOMContentLoaded', function() {
       
     });
   });
+const deleteButtons = document.querySelectorAll('.acc-secondary .delete-ticket');
+deleteButtons.forEach(button => {
+    button.addEventListener('click', function(event) {
+        const row = event.target.closest('tr');
+        const appointmentId = row.querySelector('th').textContent; 
+        row.remove();
+
+
+    });
+});
 
 
   // ON MODAL CLOSE
@@ -515,6 +528,8 @@ document.addEventListener('DOMContentLoaded', function() {
     generateToast("text-bg-success",`Ticket <strong>${ticketNo[0].textContent}</strong> tag as COMPLETE`);
   });
 
+  
+
   // PROCESS TICKET BUTTON
   addGlobalEventListener("click",'#modal-btn-process', e => {
     const tblRow   = document.querySelector("#table-ongoing");
@@ -562,12 +577,13 @@ document.addEventListener('DOMContentLoaded', function() {
     let ownername    = document.getElementById('ownername');
     let status      = document.getElementById('field-status');
     let title       = document.getElementById('request-title');
-    let description = document.getElementById('ticket-description');
+    let description = document.getElementById('description');
     let dateCreated = document.getElementById('date-created');
     let targetDate  = document.getElementById('target-date');
     let requestedBy = document.getElementById('petname');
     let assignedTo  = document.getElementById('assigned-to');
     let department  = document.getElementById('department');
+
     
     columns[5].textContent = ownername.value;
     columns[0].textContent = title.value       
@@ -580,6 +596,7 @@ document.addEventListener('DOMContentLoaded', function() {
     generateToast("text-bg-success",`Ticket ${ticketNo[0].textContent} updated`); 
   });
 
- 
 });
+
+
 
